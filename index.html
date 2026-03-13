@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maczfit Makra</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0e0e;
+  --surface: #161616;
+  --surface2: #1e1e1e;
+  --border: #2a2a2a;
+  --border2: #333;
+  --ink: #f0ece4;
+  --muted: #666;
+  --muted2: #888;
+  --accent: #e8c547;
+  --accent-dim: rgba(232,197,71,0.12);
+  --kcal: #f0ece4;
+  --fat: #e05c3a;
+  --prot: #4a9eff;
+  --carb: #50c878;
+  --r: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* ── HEADER ── */
+header {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--accent);
+}
+
+header small {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+/* ── WEEK NAV ── */
+.week-nav {
+  padding: 20px 28px 0;
+}
+
+.week-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.week-row {
+  display: flex;
+  gap: 6px;
+}
+
+.day-btn {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 4px 8px;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.day-btn:hover { border-color: var(--border2); }
+
+.day-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.day-btn .d-name {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--muted2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.day-btn.active .d-name { color: #0e0e0e; }
+
+.day-btn .d-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.day-btn.active .d-num { color: #0e0e0e; }
+
+.day-btn .d-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.day-btn.has-data .d-dot { opacity: 1; }
+.day-btn.active .d-dot { background: #0e0e0e; opacity: 1; }
+
+/* ── MAIN ── */
+.main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+/* ── TOTALS ── */
+.totals {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+
+.total-cell {
+  background: var(--surface);
+  padding: 18px 0;
+  text-align: center;
+}
+
+.total-cell .tc-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.total-cell .tc-unit {
+  font-size: 10px;
+  margin-left: 1px;
+  font-weight: 300;
+}
+
+.total-cell .tc-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 5px;
+  color: var(--muted2);
+  font-weight: 400;
+}
+
+.total-cell.t-kcal .tc-val { color: var(--kcal); }
+.total-cell.t-fat  .tc-val { color: var(--fat); }
+.total-cell.t-prot .tc-val { color: var(--prot); }
+.total-cell.t-carb .tc-val { color: var(--carb); }
+
+/* ── MEAL CARDS ── */
+.meals-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.meal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.meal-card:focus-within { border-color: var(--border2); }
+
+.meal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.meal-name-wrap { display: flex; align-items: center; gap: 10px; }
+
+.meal-icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.meal-label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.meal-kcal-badge {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--muted2);
+  transition: color 0.2s;
+}
+
+.meal-kcal-badge.has-val { color: var(--accent); }
+
+.meal-inputs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+
+.macro-field {
+  background: var(--surface2);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.macro-field label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-weight: 500;
+}
+
+.macro-field input {
+  background: transparent;
+  border: none;
+  color: var(--ink);
+  font-family: 'Outfit', sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+  width: 100%;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.macro-field input::placeholder { color: var(--border2); }
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.macro-field.f-kcal label { color: var(--muted2); }
+.macro-field.f-fat  label { color: var(--fat); }
+.macro-field.f-prot label { color: var(--prot); }
+.macro-field.f-carb label { color: var(--carb); }
+
+.macro-field.f-fat  input { color: var(--fat); }
+.macro-field.f-prot input { color: var(--prot); }
+.macro-field.f-carb input { color: var(--carb); }
+
+/* Icons per meal */
+.i-breakfast { background: rgba(232,197,71,0.15); }
+.i-brunch    { background: rgba(74,158,255,0.12); }
+.i-lunch     { background: rgba(224,92,58,0.15); }
+.i-dinner    { background: rgba(80,200,120,0.12); }
+
+/* ── CLEAR BTN ── */
+.clear-row {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.btn-clear {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  padding: 7px 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-clear:hover { border-color: var(--fat); color: var(--fat); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 500px) {
+  .week-row { gap: 4px; }
+  .day-btn .d-num { font-size: 16px; }
+  .day-btn .d-name { font-size: 9px; }
+  .totals { grid-template-columns: repeat(2, 1fr); }
+  .meal-inputs { grid-template-columns: repeat(2, 1fr); }
+  header { padding: 18px 16px 14px; }
+  .week-nav { padding: 16px 16px 0; }
+  .main { padding: 16px 12px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Maczfit</div>
+  <small>kalkulator makroskładników</small>
+</header>
+
+<div class="week-nav">
+  <div class="week-label">Wybierz dzień</div>
+  <div class="week-row" id="week-row"></div>
+</div>
+
+<div class="main">
+
+  <!-- TOTALS -->
+  <div class="totals">
+    <div class="total-cell t-kcal">
+      <div class="tc-val" id="tot-kcal">0<span class="tc-unit">kcal</span></div>
+      <div class="tc-label">Kalorie</div>
+    </div>
+    <div class="total-cell t-fat">
+      <div class="tc-val" id="tot-fat">0<span class="tc-unit">g</span></div>
+      <div class="tc-label">Tłuszcze</div>
+    </div>
+    <div class="total-cell t-prot">
+      <div class="tc-val" id="tot-prot">0<span class="tc-unit">g</span></div>
+      <div class="tc-label">Białko</div>
+    </div>
+    <div class="total-cell t-carb">
+      <div class="tc-val" id="tot-carb">0<span class="tc-unit">g</span></div>
+      <div class="tc-label">Węglowodany</div>
+    </div>
+  </div>
+
+  <!-- MEALS -->
+  <div class="meals-grid" id="meals-grid"></div>
+
+  <div class="clear-row">
+    <button class="btn-clear" onclick="clearDay()">Wyczyść ten dzień</button>
+  </div>
+
+</div>
+
+<script>
+const MEALS = [
+  { id: 'breakfast', label: 'Śniadanie',     icon: '☀️', cls: 'i-breakfast' },
+  { id: 'brunch',    label: 'II śniadanie',  icon: '🍎', cls: 'i-brunch'    },
+  { id: 'lunch',     label: 'Obiad',         icon: '🍽️', cls: 'i-lunch'     },
+  { id: 'dinner',    label: 'Kolacja',       icon: '🌙', cls: 'i-dinner'    },
+];
+
+const MACROS = [
+  { key: 'kcal', label: 'Kalorie',      cls: 'f-kcal', ph: '0' },
+  { key: 'fat',  label: 'Tłuszcze g',   cls: 'f-fat',  ph: '0' },
+  { key: 'prot', label: 'Białko g',     cls: 'f-prot', ph: '0' },
+  { key: 'carb', label: 'Węglowod. g',  cls: 'f-carb', ph: '0' },
+];
+
+// Build 7-day window centered on today
+const today = new Date();
+const DAY_NAMES = ['Nd','Pn','Wt','Śr','Cz','Pt','Sb'];
+
+function getWeekDays() {
+  // Mon–Sun of current week
+  const d = new Date(today);
+  const dow = d.getDay(); // 0=Sun
+  const monday = new Date(d);
+  monday.setDate(d.getDate() - ((dow + 6) % 7));
+  return Array.from({ length: 7 }, (_, i) => {
+    const day = new Date(monday);
+    day.setDate(monday.getDate() + i);
+    return day;
+  });
+}
+
+const weekDays = getWeekDays();
+let activeDate = today.toDateString();
+
+// Storage key helper
+const key = date => 'maczfit_' + date.toDateString();
+
+function loadDay(date) {
+  try {
+    const raw = sessionStorage.getItem(key(date));
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+
+function saveDay(date, data) {
+  try { sessionStorage.setItem(key(date), JSON.stringify(data)); } catch {}
+}
+
+function hasData(date) {
+  const d = loadDay(date);
+  return MEALS.some(m => MACROS.some(mac => d[m.id]?.[mac.key]));
+}
+
+// ── BUILD WEEK NAV ──
+function buildWeekNav() {
+  const row = document.getElementById('week-row');
+  row.innerHTML = '';
+  weekDays.forEach(date => {
+    const btn = document.createElement('button');
+    btn.className = 'day-btn' +
+      (date.toDateString() === activeDate ? ' active' : '') +
+      (hasData(date) ? ' has-data' : '');
+    btn.innerHTML = `
+      <span class="d-name">${DAY_NAMES[date.getDay()]}</span>
+      <span class="d-num">${date.getDate()}</span>
+      <span class="d-dot"></span>
+    `;
+    btn.onclick = () => { activeDate = date.toDateString(); buildWeekNav(); buildMeals(); };
+    row.appendChild(btn);
+  });
+}
+
+// ── BUILD MEAL CARDS ──
+function buildMeals() {
+  const activeDay = weekDays.find(d => d.toDateString() === activeDate) || today;
+  const data = loadDay(activeDay);
+  const grid = document.getElementById('meals-grid');
+
+  grid.innerHTML = MEALS.map(meal => {
+    const mData = data[meal.id] || {};
+    const kcalVal = mData.kcal || '';
+    return `
+      <div class="meal-card">
+        <div class="meal-header">
+          <div class="meal-name-wrap">
+            <div class="meal-icon ${meal.cls}">${meal.icon}</div>
+            <div class="meal-label">${meal.label}</div>
+          </div>
+          <div class="meal-kcal-badge ${kcalVal ? 'has-val' : ''}" id="badge-${meal.id}">
+            ${kcalVal ? Math.round(kcalVal) + ' kcal' : '—'}
+          </div>
+        </div>
+        <div class="meal-inputs">
+          ${MACROS.map(mac => `
+            <div class="macro-field ${mac.cls}">
+              <label>${mac.label}</label>
+              <input
+                type="number"
+                inputmode="decimal"
+                placeholder="${mac.ph}"
+                value="${mData[mac.key] || ''}"
+                data-meal="${meal.id}"
+                data-macro="${mac.key}"
+                oninput="onInput(this)"
+              >
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  updateTotals();
+}
+
+function onInput(el) {
+  const mealId = el.dataset.meal;
+  const macroKey = el.dataset.macro;
+  const activeDay = weekDays.find(d => d.toDateString() === activeDate) || today;
+  const data = loadDay(activeDay);
+
+  if (!data[mealId]) data[mealId] = {};
+  const val = parseFloat(el.value);
+  data[mealId][macroKey] = isNaN(val) ? null : val;
+  saveDay(activeDay, data);
+
+  // update kcal badge
+  const kcalVal = data[mealId]?.kcal;
+  const badge = document.getElementById('badge-' + mealId);
+  if (badge) {
+    badge.textContent = kcalVal ? Math.round(kcalVal) + ' kcal' : '—';
+    badge.classList.toggle('has-val', !!kcalVal);
+  }
+
+  updateTotals();
+  buildWeekNav(); // refresh dots
+}
+
+function updateTotals() {
+  const activeDay = weekDays.find(d => d.toDateString() === activeDate) || today;
+  const data = loadDay(activeDay);
+
+  const totals = { kcal: 0, fat: 0, prot: 0, carb: 0 };
+  MEALS.forEach(m => {
+    const md = data[m.id] || {};
+    MACROS.forEach(mac => { totals[mac.key] += parseFloat(md[mac.key]) || 0; });
+  });
+
+  const fmt = (v, unit) => `${Math.round(v)}<span class="tc-unit">${unit}</span>`;
+  document.getElementById('tot-kcal').innerHTML = fmt(totals.kcal, 'kcal');
+  document.getElementById('tot-fat').innerHTML  = fmt(totals.fat,  'g');
+  document.getElementById('tot-prot').innerHTML = fmt(totals.prot, 'g');
+  document.getElementById('tot-carb').innerHTML = fmt(totals.carb, 'g');
+}
+
+function clearDay() {
+  if (!confirm('Wyczyścić wszystkie makra z tego dnia?')) return;
+  const activeDay = weekDays.find(d => d.toDateString() === activeDate) || today;
+  saveDay(activeDay, {});
+  buildMeals();
+  buildWeekNav();
+}
+
+buildWeekNav();
+buildMeals();
+</script>
+</body>
+</html>

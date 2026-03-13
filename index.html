@@ -400,13 +400,13 @@ const key = date => 'maczfit_' + date.toDateString();
 
 function loadDay(date) {
   try {
-    const raw = sessionStorage.getItem(key(date));
+    const raw = localStorage.getItem(key(date));
     return raw ? JSON.parse(raw) : {};
   } catch { return {}; }
 }
 
 function saveDay(date, data) {
-  try { sessionStorage.setItem(key(date), JSON.stringify(data)); } catch {}
+  try { localStorage.setItem(key(date), JSON.stringify(data)); } catch {}
 }
 
 function hasData(date) {
